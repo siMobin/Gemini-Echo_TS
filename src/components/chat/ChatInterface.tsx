@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, MessageSquare, AlertTriangle, Wheat, Sun } from "lucide-react";
+import { Trash2, MessageSquare, AlertTriangle, Sun } from "lucide-react";
 import { ChatMessage as ChatMessageType, ChatSession, ChatError, ChatFile } from "@/types/chat";
 import { getGeminiModel } from "@/lib/gemini";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
@@ -15,6 +15,7 @@ import { GEMINI_MODELS, IMAGE_GENERATION_MODEL, isImageGenerationRequest } from 
 import { useToast } from "@/hooks/use-toast";
 import { SettingsDialog } from "./SettingsDialog";
 import { useMemorization } from "@/hooks/useMemorization";
+import logo from "../../images/couple-min.svg";
 
 interface ChatInterfaceProps {
   onLogout: () => void;
@@ -323,8 +324,8 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
       <div className="w-80 bg-card border-r border-border flex flex-col">
         <CardHeader className="flex-shrink-0">
           <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-accent rounded-full flex items-center justify-center">
-              <Wheat className="w-4 h-4 text-primary" />
+            <div className="size-8 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center">
+              <img src={logo} alt="Couple Icon" className="size-20 text-primary invert dark:invert-0" />
             </div>
             Gemini
           </CardTitle>
@@ -386,8 +387,8 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
         <div className="bg-card border-b border-border p-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-accent rounded-full flex items-center justify-center">
-                <Wheat className="w-5 h-5 text-primary" />
+              <div className="size-10 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center">
+                <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
               </div>
               <div>
                 <h2 className="font-semibold">Gemini😍</h2>
@@ -406,8 +407,8 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
               <Card className="text-center p-8 max-w-md">
-                <div className="w-16 h-16 bg-gradient-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Wheat className="w-8 h-8 text-primary" />
+                <div className="size-20 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                  <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Hay!</h3>
                 {/* TODO: Add a description */}
