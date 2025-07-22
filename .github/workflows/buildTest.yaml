@@ -17,12 +17,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20 # or your preferred version
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
         env:
-          ROLLUP_NO_NATIVE: 1 # optional if using Rollup plugins
+          ROLLUP_NO_NATIVE: 1 # optional for Rollup plugins
 
       - name: Build
         run: npm run build
