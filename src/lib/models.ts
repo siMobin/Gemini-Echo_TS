@@ -24,15 +24,5 @@ export const GEMINI_MODELS = [
   // "gemini-1.5-pro",
 ];
 
+// Image generation model
 export const IMAGE_GENERATION_MODEL = "gemini-2.0-flash-preview-image-generation";
-
-// Helper function to detect image generation requests
-export function isImageGenerationRequest(message: string): boolean {
-  const imageKeywords = ["generate image", "create image", "draw", "make a picture", "create a picture", "generate a photo", "create artwork", "paint", "sketch", "illustrate", "visualize", "show me", "can you draw", "make an image", "create visual", "generate an image"];
-
-  const messageLower = message.toLowerCase();
-  console.log("Checking image generation for:", messageLower);
-  const isImage = imageKeywords.some(keyword => messageLower.includes(keyword));
-  console.log("Is image generation request:", isImage);
-  return isImage;
-}

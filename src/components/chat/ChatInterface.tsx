@@ -11,7 +11,7 @@ import { Trash2, MessageSquare, AlertTriangle, Sun } from "lucide-react";
 import { ChatMessage as ChatMessageType, ChatSession, ChatError, ChatFile } from "@/types/chat";
 import { getGeminiModel } from "@/lib/gemini";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
-import { GEMINI_MODELS, IMAGE_GENERATION_MODEL, isImageGenerationRequest } from "@/lib/models";
+import { GEMINI_MODELS, IMAGE_GENERATION_MODEL } from "@/lib/models";
 import { useToast } from "@/hooks/use-toast";
 import { SettingsDialog } from "./SettingsDialog";
 import { useMemorization } from "@/hooks/useMemorization";
@@ -28,9 +28,26 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ChatError | null>(null);
   const [selectedModel, setSelectedModel] = useState(GEMINI_MODELS[0]);
+  const [isImageGeneration, setIsImageGeneration] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { addMemory, getMemoryContext } = useMemorization();
+
+  // Handle image generation mode changes
+  const handleImageGenerationChange = (enabled: boolean) => {
+    setIsImageGeneration(enabled);
+    if (enabled) {
+      toast({
+        title: "Image Generation Mode",
+        description: "Switched to image generation. Your next message will be used to generate an image.",
+      });
+    } else {
+      toast({
+        title: "Text Mode",
+        description: "Switched back to regular text mode.",
+      });
+    }
+  };
 
   // Load sessions from localStorage on mount
   useEffect(() => {
@@ -163,24 +180,9 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
     setError(null);
 
     try {
-      // Detect if this is an image generation request
-      const shouldGenerateImage = isImageGenerationRequest(content);
-      const modelToUse = shouldGenerateImage ? IMAGE_GENERATION_MODEL : selectedModel;
-
-      console.log("Image generation check:", {
-        content,
-        shouldGenerateImage,
-        modelToUse,
-        IMAGE_GENERATION_MODEL,
-      });
+      const modelToUse = isImageGeneration ? IMAGE_GENERATION_MODEL : selectedModel;
 
       const { genAI, model, config } = getGeminiModel(modelToUse);
-
-      // Prepare the conversation history
-      const history = newMessages.slice(0, -1).map(msg => ({
-        role: msg.role === "user" ? "user" : "model",
-        parts: [{ text: msg.content }],
-      }));
 
       // Prepare message parts
       const parts: any[] = [{ text: content }];
@@ -191,6 +193,14 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
           parts.push(processFileForGemini(file));
         });
       }
+
+      // For image generation, we don't want to include conversation history
+      const history = isImageGeneration
+        ? []
+        : newMessages.slice(0, -1).map(msg => ({
+            role: msg.role === "user" ? "user" : "model",
+            parts: [{ text: msg.content }],
+          }));
 
       // Create streaming assistant message
       const assistantMessage: ChatMessageType = {
@@ -209,7 +219,8 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
       const enhancedSystemPrompt = SYSTEM_PROMPT + memoryContext;
 
       // Prepare contents for the new API
-      const contents = [{ role: "user", parts: [{ text: enhancedSystemPrompt }] }, { role: "model", parts: [{ text: "Hello there! I'm Gemini, and I'm so excited for you! What brings you to visit today?" }] }, ...history, { role: "user", parts }];
+      // For image generation, we only want to send the prompt without any context or history
+      const contents = isImageGeneration ? [{ role: "user", parts }] : [{ role: "user", parts: [{ text: enhancedSystemPrompt }] }, { role: "model", parts: [{ text: "Hello there! I'm Gemini, and I'm so excited for you! What brings you to visit today?" }] }, ...history, { role: "user", parts }];
 
       // Generate content stream using new API
       const response = await genAI.models.generateContentStream({
@@ -252,7 +263,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
       }
 
       // Finalize the message
-      const finalContent = shouldGenerateImage && generatedImageUrl ? "I generated an image for you!" : fullResponse;
+      const finalContent = isImageGeneration && generatedImageUrl ? "I generated an image for you!" : fullResponse;
       const finalMessages = messagesWithStreaming.map(msg =>
         msg.id === assistantMessage.id
           ? {
@@ -399,7 +410,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
                 </p>
               </div>
             </div>
-            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
+            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} isImageGeneration={isImageGeneration} onImageGenerationChange={handleImageGenerationChange} />
           </div>
         </div>
 
@@ -438,7 +449,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
 
         {/* Input Area */}
         <div className="p-4 flex-shrink-0">
-          <ChatInput onSendMessage={sendMessage} isLoading={isLoading} />
+          <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isImageGeneration={isImageGeneration} />
         </div>
       </div>
     </div>

@@ -9,9 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 interface ChatInputProps {
   onSendMessage: (content: string, files?: ChatFile[]) => void;
   isLoading: boolean;
+  isImageGeneration?: boolean;
 }
 
-export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isLoading, isImageGeneration }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [files, setFiles] = useState<ChatFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -119,7 +120,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
 
       <div className="flex gap-2 items-end">
         <div className="flex-1">
-          <Textarea ref={textareaRef} onBlur={handleBlur} onFocus={handleFocus} value={input} onChange={e => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder="Try something extraordinary!" className="min-h-[60px] max-h-32 resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" disabled={isLoading} />
+          <Textarea ref={textareaRef} onBlur={handleBlur} onFocus={handleFocus} value={input} onChange={e => setInput(e.target.value)} onKeyPress={handleKeyPress} placeholder={isImageGeneration ? "Describe the image you want to generate..." : "Try something extraordinary!"} className="min-h-[60px] max-h-32 resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0" disabled={isLoading} />
         </div>
 
         <div className="flex gap-1">
@@ -129,7 +130,7 @@ export function ChatInput({ onSendMessage, isLoading }: ChatInputProps) {
             <Paperclip className="h-4 w-4" />
           </Button>
 
-          <Button onClick={handleSubmit} disabled={isLoading || (!input.trim() && files.length === 0)} className="h-10 w-10 p-0 bg-primary-background text-accent-foreground">
+          <Button onClick={handleSubmit} disabled={isLoading || (!input.trim() && files.length === 0)} className="h-10 w-10 p-0 !bg-primary-background text-white">
             <Send className="h-4 w-4" />
           </Button>
         </div>
