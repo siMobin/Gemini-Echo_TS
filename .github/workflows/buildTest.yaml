@@ -14,15 +14,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Use Node.js 20
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      - name: Clean node_modules and lockfile
+        run: rm -rf node_modules package-lock.json
+
       - name: Install dependencies
         run: npm install
         env:
-          ROLLUP_NO_NATIVE: 1 # optional for Rollup plugins
+          ROLLUP_NO_NATIVE: 1
 
-      - name: Build
+      - name: Run build
         run: npm run build
+        env:
+          ROLLUP_NO_NATIVE: 1
