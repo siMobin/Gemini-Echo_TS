@@ -24,7 +24,7 @@ export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
     <div className="min-h-screen bg-gradient-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-gradient-accent rounded-full flex items-center justify-center mb-4">
+          <div className="mx-auto w-12 h-12 bg-accent rounded-full flex items-center justify-center mb-4">
             <KeyRound className="w-6 h-6 text-primary" />
           </div>
           <CardTitle className="text-2xl">Welcome to the virtual life!</CardTitle>
@@ -42,7 +42,7 @@ export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
               <Input type="password" placeholder="Enter your Gemini API key..." value={apiKey} onChange={e => setApiKey(e.target.value)} className="w-full" disabled={isLoading} />
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-primary hover:opacity-90" disabled={!apiKey.trim() || isLoading}>
+            <Button type="submit" className="w-full bg-primary-background hover:opacity-90" disabled={!apiKey.trim() || isLoading}>
               {isLoading ? "Connecting..." : "Start Chatting..."}
             </Button>
           </form>
@@ -51,7 +51,7 @@ export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
         <CardFooter className="flex flex-col space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <span>Don't have an API key?</span>
-            <a href="https://ai.google.dev/gemini-api/docs#javascript" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
               Get one here <ExternalLink className="w-3 h-3" />
             </a>
           </div>

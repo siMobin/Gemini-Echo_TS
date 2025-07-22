@@ -8,14 +8,16 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 143 36% 96%;
-    --foreground: 143 20% 15%;
+    --background: 0 0% 98%;
+    --foreground: 43 20% 15%;
 
     --card: 0 0% 100%;
     --card-foreground: 143 20% 15%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 143 20% 15%;
+    /* --primary-background: hsl(0, 0%, 10%); */
+    --primary-background: 157 65% 25%;
 
     --primary: 143 83% 25%;
     --primary-foreground: 143 36% 96%;
@@ -26,53 +28,41 @@ All colors MUST be HSL.
     --muted: 143 25% 88%;
     --muted-foreground: 143 15% 45%;
 
-    --accent: 35 100% 85%;
-    --accent-foreground: 143 20% 15%;
+    --accent: 0, 0%, 95%;
+    --accent-foreground: 0 0% 10%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 357 100% 45%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 143 25% 85%;
-    --input: 143 25% 88%;
-    --ring: 143 83% 25%;
+    --border: 0 0% 90%;
+    --input: var(--border);
+    --ring: var(--border);
 
     /* Chat-specific colors */
-    --chat-user-bg: 143 83% 25%;
+    --chat-user-bg: var(--primary-background);
     --chat-user-fg: 143 36% 96%;
     --chat-bot-bg: 0 0% 100%;
     --chat-bot-fg: 143 20% 15%;
     --chat-input-bg: 0 0% 100%;
     --chat-bubble-shadow: 0 2px 8px hsl(143 25% 45% / 0.15);
-    
-    /* Farm-themed gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(143 83% 25%), hsl(120 70% 35%));
-    --gradient-accent: linear-gradient(135deg, hsl(35 100% 85%), hsl(45 95% 75%));
-    --gradient-background: linear-gradient(180deg, hsl(143 36% 96%), hsl(143 25% 88%));
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
+    --sidebar-background: var(--background);
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
+    --sidebar-border: var(--border);
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 180 2% 9%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: var(--background);
     --card-foreground: 210 40% 98%;
 
     --popover: 222.2 84% 4.9%;
@@ -80,43 +70,39 @@ All colors MUST be HSL.
 
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-background: 157 59% 19%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 0 0% 50%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 180 2% 16%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 357 96% 58%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 0 0% 15%;
+    --input: var(--border);
     --ring: 212.7 26.8% 83.9%;
-    
+
     /* Chat-specific colors for dark mode */
-    --chat-user-bg: 120 70% 35%;
+    --chat-user-bg: var(--primary-background);
     --chat-user-fg: 210 40% 98%;
-    --chat-bot-bg: 217.2 32.6% 17.5%;
+    --chat-bot-bg: 180 3% 15%;
     --chat-bot-fg: 210 40% 98%;
-    --chat-input-bg: 217.2 32.6% 17.5%;
+    --chat-input-bg: 180 3% 15%;
     --chat-bubble-shadow: 0 2px 8px hsl(0 0% 0% / 0.3);
-    
-    /* Farm-themed gradients for dark mode */
-    --gradient-primary: linear-gradient(135deg, hsl(120 70% 35%), hsl(120 60% 25%));
-    --gradient-accent: linear-gradient(135deg, hsl(35 80% 60%), hsl(45 75% 50%));
-    --gradient-background: linear-gradient(180deg, hsl(222.2 84% 4.9%), hsl(217.2 32.6% 17.5%));
-    
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
+
+    --sidebar-background: var(--background);
+    --sidebar-foreground: 180 2% 9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-border: var(--border);
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }

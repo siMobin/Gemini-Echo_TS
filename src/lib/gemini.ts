@@ -1,10 +1,5 @@
-import {
-  GoogleGenAI,
-  HarmBlockThreshold,
-  HarmCategory,
-  MediaResolution,
-} from '@google/genai';
-import { GEMINI_MODELS } from './models';
+import { GoogleGenAI, HarmBlockThreshold, HarmCategory } from "@google/genai";
+import { GEMINI_MODELS } from "./models";
 
 let genAI: GoogleGenAI | null = null;
 
@@ -16,16 +11,16 @@ export function initializeGemini(apiKey: string) {
 
 export function getGeminiModel(selectedModel?: string) {
   if (!genAI) {
-    throw new Error('Gemini AI not initialized. Please set your API key first.');
+    throw new Error("Gemini AI not initialized. Please set your API key first.");
   }
-  
+
   const modelToUse = selectedModel || GEMINI_MODELS[0];
-  
+
   // Check if this is an image generation model
-  const isImageGeneration = modelToUse === 'gemini-2.0-flash-preview-image-generation';
-  
+  const isImageGeneration = modelToUse === "gemini-2.0-flash-preview-image-generation";
+
   const baseConfig = {
-    temperature: 0.8,
+    temperature: 0.1,
     safetySettings: [
       {
         category: HarmCategory.HARM_CATEGORY_HARASSMENT,
@@ -44,7 +39,7 @@ export function getGeminiModel(selectedModel?: string) {
         threshold: HarmBlockThreshold.BLOCK_NONE,
       },
     ],
-    responseMimeType: 'text/plain',
+    responseMimeType: "text/plain",
   };
 
   // Configuration for image generation models
@@ -54,23 +49,20 @@ export function getGeminiModel(selectedModel?: string) {
       model: modelToUse,
       config: {
         ...baseConfig,
-        responseModalities: ['IMAGE', 'TEXT'],
-      }
+        responseModalities: ["IMAGE", "TEXT"],
+      },
     };
   }
 
-  // Configuration for regular text models  
+  // Configuration for regular text models
   return {
     genAI,
     model: modelToUse,
     config: {
       ...baseConfig,
-      mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH,
-      tools: [
-        { urlContext: {} },
-        { googleSearch: {} },
-      ],
-    }
+      // mediaResolution: MediaResolution.MEDIA_RESOLUTION_HIGH,
+      tools: [{ urlContext: {} }, { googleSearch: {} }],
+    },
   };
 }
 

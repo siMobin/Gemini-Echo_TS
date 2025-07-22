@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, Sun, Moon, Monitor, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,10 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
     setCurrentTheme(theme);
   };
 
+  useEffect(() => {
+    applyTheme(currentTheme);
+  }, [currentTheme]);
+
   const handleApiKeyUpdate = () => {
     if (!apiKey.trim()) {
       toast({
@@ -71,7 +75,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="text-black hover:text-black dark:text-white dark:hover:text-white">
           <Settings className="w-4 h-4" />
         </Button>
       </DialogTrigger>
@@ -87,7 +91,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
 
         <div className="space-y-6">
           {/* API Key Section */}
-          <Card>
+          <Card className="bg-accent">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Key className="w-4 h-4" />
@@ -99,14 +103,14 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
                 <Label htmlFor="api-key">Gemini API Key</Label>
                 <Input id="api-key" type="password" placeholder="Enter your Gemini API key" value={apiKey} onChange={e => setApiKey(e.target.value)} />
               </div>
-              <Button onClick={handleApiKeyUpdate} className="w-full">
+              <Button onClick={handleApiKeyUpdate} className="w-full !bg-primary-background text-white hover:opacity-90">
                 Update API Key
               </Button>
             </CardContent>
           </Card>
 
           {/* Theme Section */}
-          <Card>
+          <Card className="bg-accent">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 {getThemeIcon(currentTheme)}
@@ -120,7 +124,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
                   <SelectTrigger id="theme">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-background">
                     <SelectItem value="light">
                       <div className="flex items-center gap-2">
                         <Sun className="w-4 h-4" />

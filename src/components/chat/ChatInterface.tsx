@@ -319,18 +319,19 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="h-screen bg-gradient-background flex">
+    // chat background
+    <div className="h-screen bg-background flex">
       {/* Sidebar */}
       <div className="w-80 bg-card border-r border-border flex flex-col">
-        <CardHeader className="flex-shrink-0">
+        <CardHeader className="flex-shrink-0 px-4 py-2">
           <CardTitle className="flex items-center gap-2">
-            <div className="size-8 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center">
+            <div className="size-8 overflow-hidden bg-accent rounded-full flex items-center justify-center">
               <img src={logo} alt="Couple Icon" className="size-20 text-primary invert dark:invert-0" />
             </div>
             Gemini
           </CardTitle>
           <div className="flex gap-2">
-            <Button onClick={createNewSession} className="flex-1 bg-gradient-primary hover:opacity-90" size="sm">
+            <Button onClick={createNewSession} className="flex-1 !bg-primary-background text-white hover:opacity-90" size="sm">
               <MessageSquare className="w-4 h-4 mr-2" />
               New Chat
             </Button>
@@ -343,7 +344,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-2">
             {sessions.map(session => (
-              <Card key={session.id} className={`cursor-pointer transition-colors hover:bg-accent/50 ${currentSession === session.id ? "bg-accent" : ""}`} onClick={() => switchSession(session.id)}>
+              <Card key={session.id} className={`cursor-pointer transition-colors hover:bg-accent/90 ${currentSession === session.id ? "bg-accent" : ""}`} onClick={() => switchSession(session.id)}>
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -384,16 +385,16 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-card border-b border-border p-4 flex-shrink-0">
+        <div className="bg-card border-b border-border py-2 px-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="size-10 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center">
+              <div className="size-10 overflow-hidden bg-accent rounded-full flex items-center justify-center">
                 <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
               </div>
               <div>
                 <h2 className="font-semibold">Gemini😍</h2>
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
-                  <Sun className="w-3 h-3" />
+                  <Sun className="w-3 h-3 text-green-500" />
                   The Virtual partner!
                 </p>
               </div>
@@ -406,14 +407,14 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
         <ScrollArea ref={scrollAreaRef} className="flex-1 p-4">
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
-              <Card className="text-center p-8 max-w-md">
-                <div className="size-20 overflow-hidden bg-gradient-accent rounded-full flex items-center justify-center mx-auto mb-4">
+              <Card className="bg-accent text-center p-8 max-w-md">
+                <div className="size-20 overflow-hidden bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                   <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Hay!</h3>
                 {/* TODO: Add a description */}
                 <p className="text-muted-foreground mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque ab quia deserunt magnam blanditiis dolorem, consectetur quo iusto minus asperiores molestiae, quibusdam quisquam nobis nisi impedit, quas vero sint incidunt!</p>
-                <p className="text-sm text-muted-foreground">You can even share images, videos, or documents with me!</p>
+                <p className="text-sm text-white/80">You can even share images, videos, or documents with me!</p>
               </Card>
             </div>
           ) : (
