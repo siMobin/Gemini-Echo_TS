@@ -1,21 +1,28 @@
-# Test teh npm build
 name: Build Test
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
-      - run: npm install
-      - run: npm run build
+          node-version: 20 # or your preferred version
+
+      - name: Install dependencies
+        run: npm install
+        env:
+          ROLLUP_NO_NATIVE: 1 # optional if using Rollup plugins
+
+      - name: Build
+        run: npm run build
