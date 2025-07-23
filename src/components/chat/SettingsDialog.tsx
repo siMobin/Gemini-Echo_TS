@@ -38,10 +38,6 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
     setCurrentTheme(theme);
   };
 
-  useEffect(() => {
-    applyTheme(currentTheme);
-  }, [currentTheme]);
-
   const handleApiKeyUpdate = () => {
     if (!apiKey.trim()) {
       toast({
@@ -120,7 +116,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="theme">Theme</Label>
-                <Select value={currentTheme} onValueChange={applyTheme}>
+                <Select value={currentTheme} onValueChange={value => applyTheme(value as ThemeMode)}>
                   <SelectTrigger id="theme">
                     <SelectValue />
                   </SelectTrigger>

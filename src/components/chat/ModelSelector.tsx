@@ -14,9 +14,9 @@ export function ModelSelector({ selectedModel, onModelChange, isImageGeneration,
   return (
     <div className="flex items-center gap-4 text-sm">
       <div className="flex items-center gap-2">
-        <span className="text-accent-foreground font-semibold">Model:</span>
+        <span className="hidden sm:inline text-accent-foreground font-semibold">Model:</span>
         <Select value={selectedModel} onValueChange={onModelChange} disabled={isImageGeneration}>
-          <SelectTrigger className="w-[200px] h-8">
+          <SelectTrigger className="w-[140px] sm:w-[200px] h-8">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -30,7 +30,9 @@ export function ModelSelector({ selectedModel, onModelChange, isImageGeneration,
       </div>
       <div className="flex items-center gap-2">
         <Switch id="image-generation" checked={isImageGeneration} onCheckedChange={onImageGenerationChange} />
-        <Label htmlFor="image-generation">Image Generation</Label>
+        <Label htmlFor="image-generation" className="hidden sm:block">
+          Image Generation
+        </Label>
       </div>
     </div>
   );

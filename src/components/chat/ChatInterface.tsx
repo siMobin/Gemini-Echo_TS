@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, MessageSquare, AlertTriangle, Sun } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Trash2, MessageSquare, AlertTriangle, Sun, PanelLeft } from "lucide-react";
 import { ChatMessage as ChatMessageType, ChatSession, ChatError, ChatFile } from "@/types/chat";
 import { getGeminiModel } from "@/lib/gemini";
 import { SYSTEM_PROMPT } from "@/lib/system-prompt";
@@ -15,6 +16,7 @@ import { GEMINI_MODELS, IMAGE_GENERATION_MODEL } from "@/lib/models";
 import { useToast } from "@/hooks/use-toast";
 import { SettingsDialog } from "./SettingsDialog";
 import { useMemorization } from "@/hooks/useMemorization";
+import { useMobile } from "@/hooks/use-mobile";
 import logo from "../../images/couple-min.svg";
 
 interface ChatInterfaceProps {
@@ -29,9 +31,11 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
   const [error, setError] = useState<ChatError | null>(null);
   const [selectedModel, setSelectedModel] = useState(GEMINI_MODELS[0]);
   const [isImageGeneration, setIsImageGeneration] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const { addMemory, getMemoryContext } = useMemorization();
+  const isMobile = useMobile();
 
   // Handle image generation mode changes
   const handleImageGenerationChange = (enabled: boolean) => {
@@ -329,69 +333,77 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
     }
   };
 
+  const SidebarContent = () => (
+    <>
+      <CardHeader className="flex-shrink-0 px-4 py-2">
+        <CardTitle className="flex items-center gap-2">
+          <div className="size-8 overflow-hidden bg-accent rounded-full flex items-center justify-center">
+            <img src={logo} alt="Couple Icon" className="size-20 text-primary invert dark:invert-0" />
+          </div>
+          Gemini
+        </CardTitle>
+        <div className="flex gap-2">
+          <Button onClick={createNewSession} className="flex-1 !bg-primary-background text-white hover:opacity-90" size="sm">
+            <MessageSquare className="w-4 h-4 mr-2" />
+            New Chat
+          </Button>
+          <SettingsDialog onLogout={onLogout} />
+        </div>
+      </CardHeader>
+
+      <Separator />
+
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-2">
+          {sessions.map(session => (
+            <Card key={session.id} className={`cursor-pointer transition-colors hover:bg-accent/90 ${currentSession === session.id ? "bg-accent" : ""}`} onClick={() => switchSession(session.id)}>
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-medium truncate">{session.title}</h4>
+                    <p className="text-xs text-muted-foreground">{session.updatedAt.toLocaleDateString()}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={e => {
+                      e.stopPropagation();
+                      deleteSession(session.id);
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </ScrollArea>
+
+      {sessions.length > 0 && (
+        <>
+          <Separator />
+          <div className="p-4">
+            <Button variant="outline" size="sm" onClick={clearAllSessions} className="w-full text-destructive hover:bg-destructive hover:text-destructive-foreground">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Clear All Chats
+            </Button>
+          </div>
+        </>
+      )}
+    </>
+  );
+
   return (
     // chat background
-    <div className="h-screen bg-background flex">
+    <div className="h-[100dvh] bg-background flex">
       {/* Sidebar */}
-      <div className="w-80 bg-card border-r border-border flex flex-col">
-        <CardHeader className="flex-shrink-0 px-4 py-2">
-          <CardTitle className="flex items-center gap-2">
-            <div className="size-8 overflow-hidden bg-accent rounded-full flex items-center justify-center">
-              <img src={logo} alt="Couple Icon" className="size-20 text-primary invert dark:invert-0" />
-            </div>
-            Gemini
-          </CardTitle>
-          <div className="flex gap-2">
-            <Button onClick={createNewSession} className="flex-1 !bg-primary-background text-white hover:opacity-90" size="sm">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              New Chat
-            </Button>
-            <SettingsDialog onLogout={onLogout} />
-          </div>
-        </CardHeader>
-
-        <Separator />
-
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-2">
-            {sessions.map(session => (
-              <Card key={session.id} className={`cursor-pointer transition-colors hover:bg-accent/90 ${currentSession === session.id ? "bg-accent" : ""}`} onClick={() => switchSession(session.id)}>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium truncate">{session.title}</h4>
-                      <p className="text-xs text-muted-foreground">{session.updatedAt.toLocaleDateString()}</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                      onClick={e => {
-                        e.stopPropagation();
-                        deleteSession(session.id);
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </ScrollArea>
-
-        {sessions.length > 0 && (
-          <>
-            <Separator />
-            <div className="p-4">
-              <Button variant="outline" size="sm" onClick={clearAllSessions} className="w-full text-destructive hover:bg-destructive hover:text-destructive-foreground">
-                <Trash2 className="w-4 h-4 mr-2" />
-                Clear All Chats
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
+      {!isMobile && (
+        <div className="w-80 bg-card border-r border-border flex flex-col">
+          <SidebarContent />
+        </div>
+      )}
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
@@ -399,6 +411,18 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
         <div className="bg-card border-b border-border py-2 px-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              {isMobile && (
+                <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <PanelLeft className="h-6 w-6" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80 p-0 flex flex-col">
+                    <SidebarContent />
+                  </SheetContent>
+                </Sheet>
+              )}
               <div className="size-10 overflow-hidden bg-accent rounded-full flex items-center justify-center">
                 <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
               </div>
