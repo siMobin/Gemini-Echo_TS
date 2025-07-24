@@ -428,7 +428,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
               </div>
               <div>
                 <h2 className="font-semibold">Gemini😍</h2>
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <p className="text-sm text-muted-foreground hidden lg:flex items-center gap-1">
                   <Sun className="w-3 h-3 text-green-500" />
                   The Virtual partner!
                 </p>
@@ -446,10 +446,10 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
                 <div className="size-20 overflow-hidden bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
                   <img src={logo} alt="Couple Icon" className="size-30 text-primary invert dark:invert-0" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Hay!</h3>
+                <h3 className="text-lg font-semibold mb-2 text-orange-500 dark:text-orange-400">WARNING!</h3>
                 {/* TODO: Add a description */}
-                <p className="text-muted-foreground mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque ab quia deserunt magnam blanditiis dolorem, consectetur quo iusto minus asperiores molestiae, quibusdam quisquam nobis nisi impedit, quas vero sint incidunt!</p>
-                <p className="text-sm text-white/80">You can even share images, videos, or documents with me!</p>
+                <p className="text-muted-foreground mb-4">The system instructions are designed to make this AI behave as a girl and act as a partner. It can respond to adult or sexually explicit content.</p>
+                {/* <p className="text-sm text-white/80">You can even share images, videos, or documents with me!</p> */}
               </Card>
             </div>
           ) : (
