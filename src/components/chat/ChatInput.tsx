@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Paperclip, X } from "lucide-react";
+import { Send, Paperclip, X, Image as ImageIcon, FileText, Zap } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChatFile } from "@/types/chat";
 import { useToast } from "@/hooks/use-toast";
 
@@ -10,9 +11,10 @@ interface ChatInputProps {
   onSendMessage: (content: string, files?: ChatFile[]) => void;
   isLoading: boolean;
   isImageGeneration?: boolean;
+  onImageGenerationChange: (enabled: boolean) => void;
 }
 
-export function ChatInput({ onSendMessage, isLoading, isImageGeneration }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isLoading, isImageGeneration, onImageGenerationChange }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [files, setFiles] = useState<ChatFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -126,9 +128,23 @@ export function ChatInput({ onSendMessage, isLoading, isImageGeneration }: ChatI
         <div className="flex gap-1">
           <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt" className="hidden" />
 
-          <Button variant="ghost" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isLoading} className="h-10 w-10 p-0">
-            <Paperclip className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" disabled={isLoading} className="h-10 w-10 p-0">
+                <Zap className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                <Paperclip className="h-4 w-4 mr-2" />
+                Attach File
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onImageGenerationChange(!isImageGeneration)}>
+                {isImageGeneration ? <FileText className="h-4 w-4 mr-2" /> : <ImageIcon className="h-4 w-4 mr-2" />}
+                {isImageGeneration ? "Text Mode" : "Image Generation"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button onClick={handleSubmit} disabled={isLoading || (!input.trim() && files.length === 0)} className="h-10 w-10 p-0 !bg-primary-background text-white">
             <Send className="h-4 w-4" />

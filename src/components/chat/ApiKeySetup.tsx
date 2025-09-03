@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { KeyRound, ExternalLink, Info } from "lucide-react";
+import { KeyRound, ExternalLink, Info, Upload } from "lucide-react";
 
 interface ApiKeySetupProps {
   onApiKeySubmit: (apiKey: string) => void;
@@ -11,6 +11,42 @@ interface ApiKeySetupProps {
 }
 
 export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
+  // Ref for hidden file input
+  const importInputRef = useRef<HTMLInputElement>(null);
+  // Import all user data from JSON file
+  const handleImportData = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target?.result as string);
+        if (imported && typeof imported === "object") {
+          // Sessions
+          if (Array.isArray(imported.sessions)) {
+            localStorage.setItem("gemini-chat-sessions", JSON.stringify(imported.sessions));
+          }
+          // API Key
+          if (typeof imported.apiKey === "string") {
+            localStorage.setItem("gemini-api-key", imported.apiKey);
+            setApiKey(imported.apiKey);
+          }
+          // Theme
+          if (typeof imported.theme === "string") {
+            localStorage.setItem("gemini-theme", imported.theme);
+          }
+          // Memories
+          if (typeof imported.memories === "string") {
+            localStorage.setItem("gemini-memories", imported.memories);
+          }
+          // alert("Import successful! Your data has been restored.");
+        } else {
+          throw new Error("Invalid data format");
+        }
+      } catch (err: any) {
+        alert("Import failed: " + (err.message || "Could not import data."));
+      }
+    };
+    reader.readAsText(file);
+  };
   const [apiKey, setApiKey] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,7 +58,7 @@ export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
 
   return (
     <div className="min-h-screen bg-gradient-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-gray-300/5 ">
         <CardHeader className="text-center">
           <div className="mx-auto w-12 h-12 bg-accent rounded-full flex items-center justify-center mb-4">
             <KeyRound className="w-6 h-6 text-primary" />
@@ -42,10 +78,33 @@ export function ApiKeySetup({ onApiKeySubmit, isLoading }: ApiKeySetupProps) {
               <Input type="password" placeholder="Enter your Gemini API key..." value={apiKey} onChange={e => setApiKey(e.target.value)} className="w-full" disabled={isLoading} />
             </div>
 
-            <Button type="submit" className="w-full bg-primary-background hover:opacity-90" disabled={!apiKey.trim() || isLoading}>
+            <Button type="submit" className="w-full !bg-primary-background hover:opacity-90 dark:text-white" disabled={!apiKey.trim() || isLoading}>
               {isLoading ? "Connecting..." : "Start Chatting..."}
             </Button>
           </form>
+          <p className=" my-4 text-center w-full italic">or</p>
+
+          <div className="flex flex-col gap-2">
+            {/* <label className="block text-sm font-medium mb-1">Or import all your data:</label> */}
+            <div className="w-full">
+              <Button type="button" className="w-full flex items-center gap-2 !bg-primary-background text-white hover:opacity-90" size="sm" onClick={() => importInputRef.current?.click()}>
+                <Upload className="w-4 h-4" />
+                Import Data
+              </Button>
+              <Input
+                ref={importInputRef}
+                type="file"
+                accept="application/json"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImportData(file);
+                  // Reset input value so same file can be selected again
+                  if (e.target) e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-2 text-sm text-muted-foreground">

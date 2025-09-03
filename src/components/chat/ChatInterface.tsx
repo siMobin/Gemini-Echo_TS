@@ -24,6 +24,75 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ onLogout }: ChatInterfaceProps) {
+  // Export all user data (sessions, api key, theme, memories) as JSON file
+  const handleExportData = () => {
+    const exportData = {
+      sessions,
+      apiKey: localStorage.getItem("gemini-api-key"),
+      theme: localStorage.getItem("gemini-theme"),
+      memories: localStorage.getItem("gemini-memories"),
+    };
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `gemini-all-data-export-${new Date().toISOString()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Export Successful", description: "All your data has been exported." });
+  };
+
+  // Import all user data from JSON file
+  const handleImportData = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target?.result as string);
+        if (imported && typeof imported === "object") {
+          // Sessions
+          if (Array.isArray(imported.sessions)) {
+            setSessions(
+              imported.sessions.map(session => ({
+                ...session,
+                createdAt: new Date(session.createdAt),
+                updatedAt: new Date(session.updatedAt),
+                messages: session.messages.map((msg: any) => ({
+                  ...msg,
+                  timestamp: new Date(msg.timestamp),
+                })),
+              }))
+            );
+            if (imported.sessions.length > 0) {
+              setCurrentSession(imported.sessions[0].id);
+              setMessages(imported.sessions[0].messages);
+            }
+            localStorage.setItem("gemini-chat-sessions", JSON.stringify(imported.sessions));
+          }
+          // API Key
+          if (typeof imported.apiKey === "string") {
+            localStorage.setItem("gemini-api-key", imported.apiKey);
+          }
+          // Theme
+          if (typeof imported.theme === "string") {
+            localStorage.setItem("gemini-theme", imported.theme);
+          }
+          // Memories
+          if (typeof imported.memories === "string") {
+            localStorage.setItem("gemini-memories", imported.memories);
+          }
+          toast({ title: "Import Successful", description: "All your data has been imported." });
+        } else {
+          throw new Error("Invalid data format");
+        }
+      } catch (err: any) {
+        toast({ title: "Import Failed", description: err.message || "Could not import data.", variant: "destructive" });
+      }
+    };
+    reader.readAsText(file);
+  };
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
@@ -235,24 +304,26 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
 
       let fullResponse = "";
       let generatedImageUrl = "";
+      let finalMessages: ChatMessageType[] = [];
 
       for await (const chunk of response) {
         // Handle image generation
         if (chunk.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
           const inlineData = chunk.candidates[0].content.parts[0].inlineData;
           if (inlineData.data && inlineData.mimeType) {
-            // Convert base64 to blob URL for display
-            const byteCharacters = atob(inlineData.data);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: inlineData.mimeType });
-            generatedImageUrl = URL.createObjectURL(blob);
-
-            // Update message with image
-            setMessages(prev => prev.map(msg => (msg.id === assistantMessage.id ? { ...msg, content: "I generated an image for you!", imageUrl: generatedImageUrl } : msg)));
+            const base64Data = `data:${inlineData.mimeType};base64,${inlineData.data}`;
+            generatedImageUrl = base64Data;
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === assistantMessage.id
+                  ? {
+                      ...msg,
+                      content: fullResponse || "I generated an image for you!",
+                      imageUrl: generatedImageUrl,
+                    }
+                  : msg
+              )
+            );
           }
         }
         // Handle text response
@@ -260,15 +331,24 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
           const chunkText = chunk.text;
           if (chunkText) {
             fullResponse += chunkText;
-
-            setMessages(prev => prev.map(msg => (msg.id === assistantMessage.id ? { ...msg, content: fullResponse } : msg)));
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === assistantMessage.id
+                  ? {
+                      ...msg,
+                      content: fullResponse,
+                      imageUrl: generatedImageUrl || undefined,
+                    }
+                  : msg
+              )
+            );
           }
         }
       }
 
       // Finalize the message
-      const finalContent = isImageGeneration && generatedImageUrl ? "I generated an image for you!" : fullResponse;
-      const finalMessages = messagesWithStreaming.map(msg =>
+      const finalContent = fullResponse || (isImageGeneration && generatedImageUrl ? "I generated an image for you!" : "");
+      finalMessages = messagesWithStreaming.map(msg =>
         msg.id === assistantMessage.id
           ? {
               ...msg,
@@ -347,7 +427,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
             <MessageSquare className="w-4 h-4 mr-2" />
             New Chat
           </Button>
-          <SettingsDialog onLogout={onLogout} />
+          <SettingsDialog onLogout={onLogout} onExportData={handleExportData} onImportData={handleImportData} />
         </div>
       </CardHeader>
 
@@ -434,7 +514,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
                 </p>
               </div>
             </div>
-            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} isImageGeneration={isImageGeneration} onImageGenerationChange={handleImageGenerationChange} />
+            <ModelSelector selectedModel={selectedModel} onModelChange={setSelectedModel} />
           </div>
         </div>
 
@@ -473,7 +553,7 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
 
         {/* Input Area */}
         <div className="p-4 flex-shrink-0">
-          <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isImageGeneration={isImageGeneration} />
+          <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isImageGeneration={isImageGeneration} onImageGenerationChange={handleImageGenerationChange} />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { Settings, Sun, Moon, Monitor, Key } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Settings, Sun, Moon, Monitor, Key, FolderInput } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,11 +12,17 @@ import { useToast } from "@/hooks/use-toast";
 
 interface SettingsDialogProps {
   onLogout: () => void;
+  onExportData: () => void;
+  onImportData: (file: File) => void;
 }
 
 type ThemeMode = "light" | "dark" | "system";
 
-export function SettingsDialog({ onLogout }: SettingsDialogProps) {
+export function SettingsDialog({ onLogout, onExportData, onImportData }: SettingsDialogProps) {
+  // Ref for hidden file input
+  const importInputRef = useRef<HTMLInputElement>(null);
+  // For import file input
+  const [importing, setImporting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [currentTheme, setCurrentTheme] = useState<ThemeMode>(() => {
@@ -76,7 +83,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[50vw] sm:w-[40vw]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
@@ -85,7 +92,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
           <DialogDescription>Manage your chat preferences and account settings.</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* API Key Section */}
           <Card className="bg-accent">
             <CardHeader className="pb-3">
@@ -99,7 +106,7 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
                 <Label htmlFor="api-key">Gemini API Key</Label>
                 <Input id="api-key" type="password" placeholder="Enter your Gemini API key" value={apiKey} onChange={e => setApiKey(e.target.value)} />
               </div>
-              <Button onClick={handleApiKeyUpdate} className="w-full !bg-primary-background text-white hover:opacity-90">
+              <Button onClick={handleApiKeyUpdate} className="w-full !bg-primary-background text-white hover:opacity-90" size="sm">
                 Update API Key
               </Button>
             </CardContent>
@@ -145,11 +152,60 @@ export function SettingsDialog({ onLogout }: SettingsDialogProps) {
             </CardContent>
           </Card>
 
+          {/* <Separator /> */}
+
+          {/* Data Export/Import Section */}
+          <Card className="bg-accent">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex gap-2 items-center">
+                <FolderInput className="w-4 h-4" />
+                Import/Export
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space- flex justify-center items-start gap-4">
+              <div className="w-full space-y-2">
+                <Label htmlFor="export-data">Export Data</Label>
+                <Button onClick={onExportData} className="w-full !bg-primary-background text-white hover:opacity-90" size="sm">
+                  Export All Data
+                </Button>
+              </div>
+              <div className="w-full space-y-2">
+                <Label htmlFor="import-data" className="">
+                  Import Data
+                </Label>
+                <div className="w-full">
+                  <Button type="button" className="w-full flex items-center gap-2 !bg-primary-background text-white hover:opacity-90" size="sm" disabled={importing} onClick={() => importInputRef.current?.click()}>
+                    <Upload className="w-4 h-4" />
+                    {importing ? "Importing..." : "Import All Data"}
+                  </Button>
+                  <Input
+                    ref={importInputRef}
+                    id="import-data"
+                    type="file"
+                    accept="application/json"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImporting(true);
+                        onImportData(file);
+                        setTimeout(() => setImporting(false), 1000);
+                        // Reset input value so same file can be selected again
+                        e.target.value = "";
+                      }
+                    }}
+                    disabled={importing}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Separator />
 
           {/* Account Actions */}
           <div className="space-y-2">
-            <Button variant="destructive" onClick={onLogout} className="w-full">
+            <Button size="sm" variant="destructive" onClick={onLogout} className="w-full">
               Logout & Clear Data
             </Button>
           </div>
