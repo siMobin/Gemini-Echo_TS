@@ -12,7 +12,7 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
       <div className="flex items-center gap-2">
         <span className="hidden sm:inline text-accent-foreground font-semibold">Model:</span>
         <Select value={selectedModel} onValueChange={onModelChange}>
-          <SelectTrigger className="w-[100px] sm:w-[200px] h-8">
+          <SelectTrigger className="w-[130px] sm:w-[200px] h-8">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
