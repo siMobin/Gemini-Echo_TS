@@ -289,7 +289,21 @@ export function ChatInterface({ onLogout }: ChatInterfaceProps) {
 
       // Get memory context for enhanced responses
       const memoryContext = getMemoryContext();
-      const enhancedSystemPrompt = SYSTEM_PROMPT + memoryContext;
+      // get current date, time in Dhaka,BD.
+      const date = new Date();
+      const options: Intl.DateTimeFormatOptions = {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+        timeZone: "Asia/Dhaka",
+        timeZoneName: "short",
+      };
+      const formattedDate = date.toLocaleString("en-GB", options);
+      console.log(formattedDate);
+      const enhancedSystemPrompt = formattedDate + SYSTEM_PROMPT + memoryContext;
 
       // Prepare contents for the new API
       // For image generation, we only want to send the prompt without any context or history

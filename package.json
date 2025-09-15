@@ -1,7 +1,12 @@
 {
   "name": "gemini_echo_ts",
   "private": true,
-  "version": "04.09.2025",
+  "author": {
+    "name": "siMobin",
+    "email": "shakibulislammobin@gmail.com",
+    "url": "https://github.com/siMobin"
+  },
+  "version": "15.09.2025",
   "type": "module",
   "scripts": {
     "dev": "vite",
